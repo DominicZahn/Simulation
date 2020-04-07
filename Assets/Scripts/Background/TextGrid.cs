@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 public class TextGrid
 {
     private char[] grid;
     private int columns;
     private int rows;
-    private List<Line> lines = new List<Line>();
+    private Line[] lines;
+    private int lineCount;
+    private int maxLineLength;
 
     public TextGrid(int rows, int columns)
     {
@@ -109,36 +112,50 @@ public class TextGrid
     /// </summary>
     /// <param name="maxLines">maximum amount of lines in a single grid</param>
     /// <param name="maxLength">maximum length of a line</param>
-    public void expandLines(int maxLines, int maxLength)
+    public void expandLines()
     {
-
-        foreach (Line curr in lines)
+        for (int i = 0; i < lines.Length; i++)
         {
-            if (!curr.expand())
+            if (!lines[i].expand())
             {
-                lines.Remove(curr);
+                lines[i] = createLine();
             }
         }
-        
-        //adding new one if it is neccessary
-        if (lines.Count < maxLines)
-        {
-            Random rng = new Random();
-            lines.Add(new Line(rng.Next(0, rows), rng.Next(columns), maxLength));
-        }
-        
+
         updateGrid();
     }
 
     private void updateGrid()
     {
         clearGrid();
-        foreach (Line curr in lines)
+        for (int i = 0; i < lines.Length; i++)
         {
-            for (int y = 0; y < curr.getLength() - 1; y++) {
-                setChar(curr.getStartPos().X, curr.getStartPos().Y + y, curr.getValue(y));
+            for (int y = 0; y < lines[i].getLength() - 1; y++) {
+                setChar(lines[i].getStartPos().X, lines[i].getStartPos().Y + y, lines[i].getValue(y));
             }
         }
+    }
+
+    /// <summary>
+    /// creates the first set of lines and sets up the parameters for all following lines
+    /// </summary>
+    /// <param name="lineCount">The number of lines which are displayed in one frame.</param>
+    /// <param name="maxLength">The posible maximum length of a line.</param>
+    public void setupLines(int lineCount, int maxLength)
+    {
+        this.lineCount = lineCount;
+        this.maxLineLength = maxLength;
+        lines = new Line[lineCount];
+        for (int i = 0; i < lineCount; i++)
+        {
+            lines[i] = createLine();
+        }
+    }
+
+    Random rng = new Random();
+    private Line createLine()
+    {
+        return new Line(rng.Next(rows), rng.Next(columns), rng.Next(maxLineLength));
     }
 
     private void clearGrid()
@@ -233,15 +250,15 @@ public class TextGrid
         /// <returns>false if it is at is maximum lenght now</returns>
         public bool expand()
         {
+            Random rnd = new Random();
             length++;
-            if (length > maxLength)
+            if (length >= maxLength)
                 return false;
             // randomizes the values of the line
             if (random)
             {
                 for (int i = 0; i < maxLength; i++)
                 {
-                    Random rnd = new Random();
                     value[i] = (char) rnd.Next(48, 58);
                 }
             }

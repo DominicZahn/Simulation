@@ -7,18 +7,19 @@ public class MatrixBackground : MonoBehaviour
 {
     public TextMeshProUGUI background;
     TextGrid tg;
-    const int lineCount = 1;
+    const int lineCount = 10;
     const int maxColumns = 68;
     const int maxRows = 172;
-    const int maxLength = 20;
+    const int maxLength = 50;
 
     // Start is called before the first frame update
     void Start()
     {
         background.richText = true;
         tg = new TextGrid(maxRows, maxColumns);
+        tg.setupLines(lineCount, maxLength);
 
-        InvokeRepeating("updateMatrix", 0, 1f);
+        //InvokeRepeating("updateMatrix", 0, 1f);
         /*
         background.richText = true;
         string oldText = background.text;
@@ -28,13 +29,14 @@ public class MatrixBackground : MonoBehaviour
 
     void updateMatrix()
     {
-        tg.expandLines(lineCount, maxLength);
+        tg.expandLines();
         background.text = tg.gridToString();
     }
 
     // Update is called once per frame
     void Update()
     {
+        updateMatrix();
     }
 
     /// <summary>
