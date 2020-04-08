@@ -9,7 +9,7 @@ public class MatrixBackground : MonoBehaviour
     TextGrid tg;
     const int lineCount = 150;
     const int maxColumns = 68;
-    const int maxRows = 172;
+    const int maxRows = 171;
     const int maxLength = 50;
 
     // Start is called before the first frame update

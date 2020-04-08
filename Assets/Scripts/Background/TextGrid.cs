@@ -61,7 +61,8 @@ public class TextGrid
         try
         {
             grid[gridIndex(x, y)] = c;
-        } catch (ArgumentOutOfRangeException) { }
+        }
+        catch (ArgumentOutOfRangeException) { }
     }
 
     /// <summary>
@@ -130,7 +131,8 @@ public class TextGrid
         clearGrid();
         for (int i = 0; i < lines.Length; i++)
         {
-            for (int y = 0; y < lines[i].getLength() - 1; y++) {
+            for (int y = 0; y < lines[i].getLength() - 1; y++)
+            {
                 setChar(lines[i].getStartPos().X, lines[i].getStartPos().Y + y, lines[i].getValue(y));
             }
         }
@@ -190,6 +192,7 @@ public class TextGrid
         private Point startPoint;
         private int length;
         private int maxLength;
+        private bool reachedMax = false;
 
         /// <summary>
         /// Constructor to create a uniform line with parameters.
@@ -252,15 +255,28 @@ public class TextGrid
         public bool expand()
         {
             Random rnd = new Random();
-            length++;
+            //shrinks or expands
+            if (reachedMax)
+            {
+                length--;
+                startPoint.Y++;
+            }
+            else
+            {
+                length++;
+            }
             if (length >= maxLength)
+                reachedMax = true;
+
+            if (length <= 0 && reachedMax)
                 return false;
+
             // randomizes the values of the line
             if (random)
             {
                 for (int i = 0; i < maxLength; i++)
                 {
-                    value[i] = (char) rnd.Next(48, 58);
+                    value[i] = (char)rnd.Next(48, 58);
                 }
             }
             return true;
