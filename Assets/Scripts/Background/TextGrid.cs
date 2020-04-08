@@ -155,7 +155,8 @@ public class TextGrid
     Random rng = new Random();
     private Line createLine()
     {
-        return new Line(rng.Next(rows), rng.Next(columns), rng.Next(maxLineLength));
+        int minLength = (int)(0.1f * maxLineLength);
+        return new Line(rng.Next(rows), rng.Next(columns), rng.Next(minLength, maxLineLength));
     }
 
     private void clearGrid()
