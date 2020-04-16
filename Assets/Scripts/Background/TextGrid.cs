@@ -8,6 +8,7 @@ public class TextGrid
     private int columns;
     private int rows;
     private Line[] lines;
+    private List<Text> texts;
     private int lineCount;
     private int maxLineLength;
     private Color[] charColors;
@@ -21,12 +22,8 @@ public class TextGrid
         {
             grid[i] = ' ';
         }
-
-        charColors = new Color[columns * rows];
-        for (int i = 0; i < columns * rows; i++)
-        {
-            charColors[i] = Color.Transparent; //default colour
-        }
+        setupColors();
+        setupTexts();
     }
 
     /// <summary>
@@ -44,7 +41,17 @@ public class TextGrid
         {
             grid[i] = c;
         }
+        setupColors();
+        setupTexts();
+    }
 
+    private void setupTexts()
+    {
+        texts = new List<Text>();
+    }
+
+    private void setupColors()
+    {
         charColors = new Color[columns * rows];
         for (int i = 0; i < columns * rows; i++)
         {
@@ -63,7 +70,9 @@ public class TextGrid
     }
 
     /// <summary>
-    /// sets a new color for a char in the grid
+    /// sets a new color for a char in the grid.
+    /// This shouldn`t be used to color the whole screen!! It will lead to huge performance issues.
+    /// Use it just for partly coloring.
     /// </summary>
     /// <param name="x">rows</param>
     /// <param name="y">colums</param>
@@ -129,14 +138,6 @@ public class TextGrid
     /// <returns>The string which contains a whole column.</returns>
     public string columnToString(int y)
     {
-        /*
-        char[] arrColumn = new char[rows];
-        for (int x = 0; x < rows; x++)
-        {
-            arrColumn[x] = getChar(x, y);
-        }
-        return new string(arrColumn);
-        */
         string strColumn = " ";
         for (int x = 0; x < rows; x++)
         {
@@ -182,11 +183,25 @@ public class TextGrid
     private void updateGrid()
     {
         clearGrid();
+        // Lines
         for (int i = 0; i < lines.Length; i++)
         {
             for (int y = 0; y < lines[i].getLength() - 1; y++)
             {
                 setChar(lines[i].getStartPos().X, lines[i].getStartPos().Y + y, lines[i].getValue(y));
+            }
+        }
+        // Text
+        foreach (Text curr in texts)
+        {
+            const float glitchPercentage = 0.1f;
+            curr.updateText(glitchPercentage);
+
+            //draw values
+            for (int x = 0; x < curr.getValues().Length; x++)
+            {
+                setChar(curr.getStartPoint().X + x, curr.getStartPoint().Y, curr.getValues()[x]);
+                setCharColor(curr.getStartPoint().X + x, curr.getStartPoint().Y, curr.getColor());
             }
         }
     }
@@ -205,6 +220,19 @@ public class TextGrid
         {
             lines[i] = createLine();
         }
+    }
+
+    /// <summary>
+    /// Creates a new Text that will be displayed in the grid.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="text"></param>
+    /// <param name="color"></param>
+    public void addText(int x, int y, string text, Color color)
+    {
+        Text nText = new Text(x, y, text, color);
+        texts.Add(nText);
     }
 
     Random rng = new Random();
@@ -236,7 +264,7 @@ public class TextGrid
     }
 
     /// <summary>
-    /// Class that is used to generate a vertical line.
+    /// Lines that are build for using them as a vertical rain animation.
     /// </summary>
     private class Line
     {
@@ -333,6 +361,91 @@ public class TextGrid
                 }
             }
             return true;
+        }
+    }
+
+    private class Text
+    {
+        private Point startPoint;
+        private string text;
+        private Color color;
+        private char[] values;
+        private int length;
+
+        public Text(int x, int y, string text, Color color)
+        {
+            this.startPoint.X = x;
+            this.startPoint.Y = y;
+            this.text = text;
+            this.color = color;
+            this.length = text.Length;
+            this.values = new char[length];
+        }
+
+        public void setStartPoint(Point startPoint)
+        {
+            this.startPoint = startPoint;
+        }
+
+        public Point getStartPoint()
+        {
+            return startPoint;
+        }
+
+        public void setText(string text)
+        {
+            this.text = text;
+            this.length = text.Length;
+            this.values = new char[length];
+        }
+
+        public string getText()
+        {
+            return text;
+        }
+
+        public void setColor(Color color)
+        {
+            this.color = color;
+        }
+
+        public Color getColor()
+        {
+            return color;
+        }
+
+        public int getLength()
+        {
+            return length;
+        }
+
+        public char[] getValues()
+        {
+            return values;
+        }
+
+        Random rng = new Random();
+        public void updateText(float wrongCharPercentage)
+        {
+            // creates glitches
+            if (0 > wrongCharPercentage || wrongCharPercentage > 1)
+            {
+                throw new ArgumentOutOfRangeException(wrongCharPercentage + "is not between 0 and 1.");
+            }
+            int glitchCount = (int)(length * wrongCharPercentage);
+            int[] glitches = new int[glitchCount];
+
+            for (int i = 0; i < glitchCount; i++)
+            {
+                glitches[i] = rng.Next(glitchCount);
+            }
+
+            // insert glitches into the values
+            values = text.ToCharArray();
+            for (int i = 0; i < glitchCount; i++)
+            {
+                values[glitches[i]] = (char)(48 + rng.Next(10));
+            }
         }
     }
 }

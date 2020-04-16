@@ -19,14 +19,9 @@ public class MatrixBackground : MonoBehaviour
         background.richText = true;
         tg = new TextGrid(maxRows, maxColumns);
         tg.setupLines(lineCount, maxLength);
-        for (int x = 0; x < maxRows; x++)
-        {
-            for (int y = 0; y < maxColumns; y++)
-            {
-                tg.setCharColor(10, 10, SysColor.Red);
-            }
-        }
 
+        tg.addText(50, 50, "Hello world. My name is Dominic and i hope this works with a longer sentence.", SysColor.Red);
+        tg.addText(30, 30, "Fuck you", SysColor.Blue);
         InvokeRepeating("updateMatrix", 0, 0.1f);
 
 
