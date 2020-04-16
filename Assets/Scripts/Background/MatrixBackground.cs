@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using SysColor = System.Drawing.Color;
 
 public class MatrixBackground : MonoBehaviour
 {
@@ -18,12 +19,21 @@ public class MatrixBackground : MonoBehaviour
         background.richText = true;
         tg = new TextGrid(maxRows, maxColumns);
         tg.setupLines(lineCount, maxLength);
+        for (int x = 0; x < maxRows; x++)
+        {
+            for (int y = 0; y < maxColumns; y++)
+            {
+                tg.setCharColor(10, 10, SysColor.Red);
+            }
+        }
 
         InvokeRepeating("updateMatrix", 0, 0.1f);
+
+
         /*
         background.richText = true;
-        string oldText = background.text;
-        background.text = $"Coloured text <color=red>{ oldText }</color>";
+        string oldText = "Hello world";
+        background.text = $"Colored text <color=red>{ oldText }</color>";
         */
     }
 

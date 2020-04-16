@@ -10,6 +10,7 @@ public class TextGrid
     private Line[] lines;
     private int lineCount;
     private int maxLineLength;
+    private Color[] charColors;
 
     public TextGrid(int rows, int columns)
     {
@@ -19,6 +20,12 @@ public class TextGrid
         for (int i = 0; i < columns * rows; i++)
         {
             grid[i] = ' ';
+        }
+
+        charColors = new Color[columns * rows];
+        for (int i = 0; i < columns * rows; i++)
+        {
+            charColors[i] = Color.Transparent; //default colour
         }
     }
 
@@ -37,6 +44,12 @@ public class TextGrid
         {
             grid[i] = c;
         }
+
+        charColors = new Color[columns * rows];
+        for (int i = 0; i < columns * rows; i++)
+        {
+            charColors[i] = Color.Transparent; //default colour
+        }
     }
 
     public int getColumns()
@@ -47,6 +60,22 @@ public class TextGrid
     public int getRows()
     {
         return this.rows;
+    }
+
+    /// <summary>
+    /// sets a new color for a char in the grid
+    /// </summary>
+    /// <param name="x">rows</param>
+    /// <param name="y">colums</param>
+    /// <param name="color">the new colour (transparent is default)</param>
+    public void setCharColor(int x, int y, Color color)
+    {
+        charColors[gridIndex(x, y)] = color;
+    }
+
+    public Color getCharColor(int x, int y)
+    {
+        return charColors[gridIndex(x, y)];
     }
 
     /// <summary>
@@ -85,7 +114,7 @@ public class TextGrid
     /// <returns>A string that represents the grid.</returns>
     public string gridToString()
     {
-        string strGrid = "";
+        string strGrid = $"";
         for (int i = 0; i < columns; i++)
         {
             strGrid += columnToString(i) + "\n";
@@ -100,12 +129,36 @@ public class TextGrid
     /// <returns>The string which contains a whole column.</returns>
     public string columnToString(int y)
     {
+        /*
         char[] arrColumn = new char[rows];
-        for (int i = 0; i < rows; i++)
+        for (int x = 0; x < rows; x++)
         {
-            arrColumn[i] = getChar(i, y);
+            arrColumn[x] = getChar(x, y);
         }
         return new string(arrColumn);
+        */
+        string strColumn = " ";
+        for (int x = 0; x < rows; x++)
+        {
+            string color = colorToString(charColors[gridIndex(x, y)]);
+            if (!color.Equals(colorToString(Color.Transparent)))
+            {
+                strColumn += "<color=" + color + ">" + getChar(x, y) + "</color>";
+            }
+            else
+            {
+                strColumn += getChar(x, y);
+            }
+        }
+        return strColumn;
+    }
+
+    private string colorToString(Color color)
+    {
+        string str = color.ToString();
+        str = str.Substring(7); //cause of "Color ["
+        str = str.Remove(str.Length - 1); //to remove ]
+        return str.ToLower();
     }
 
     /// <summary>
