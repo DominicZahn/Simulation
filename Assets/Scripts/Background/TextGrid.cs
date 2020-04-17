@@ -374,12 +374,9 @@ public class TextGrid
 
         public Text(int x, int y, string text, Color color)
         {
-            this.startPoint.X = x;
-            this.startPoint.Y = y;
-            this.text = text;
-            this.color = color;
-            this.length = text.Length;
-            this.values = new char[length];
+            setStartPoint(new Point(x, y));
+            setText(text);
+            setColor(color);
         }
 
         public void setStartPoint(Point startPoint)
@@ -394,7 +391,7 @@ public class TextGrid
 
         public void setText(string text)
         {
-            this.text = text;
+            this.text = text.ToUpper();
             this.length = text.Length;
             this.values = new char[length];
         }
@@ -437,14 +434,16 @@ public class TextGrid
 
             for (int i = 0; i < glitchCount; i++)
             {
-                glitches[i] = rng.Next(glitchCount);
+                glitches[i] = rng.Next(length);
             }
 
             // insert glitches into the values
             values = text.ToCharArray();
             for (int i = 0; i < glitchCount; i++)
             {
-                values[glitches[i]] = (char)(48 + rng.Next(10));
+                if (values[glitches[i]].Equals(' '))
+                    continue;
+                values[glitches[i]] = (char)(48 + rng.Next(9));
             }
         }
     }

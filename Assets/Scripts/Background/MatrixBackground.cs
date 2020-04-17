@@ -21,7 +21,7 @@ public class MatrixBackground : MonoBehaviour
         tg.setupLines(lineCount, maxLength);
 
         tg.addText(50, 50, "Hello world. My name is Dominic and i hope this works with a longer sentence.", SysColor.Red);
-        tg.addText(30, 30, "Fuck you", SysColor.Blue);
+        tg.addText(0, 0, "HELLO", SysColor.Transparent);
         InvokeRepeating("updateMatrix", 0, 0.1f);
 
 
