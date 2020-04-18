@@ -20,8 +20,8 @@ public class MatrixBackground : MonoBehaviour
         tg = new TextGrid(maxRows, maxColumns);
         tg.setupLines(lineCount, maxLength);
 
-        tg.addText(50, 50, "Hello world. My name is Dominic and i hope this works with a longer sentence.", SysColor.Red);
-        tg.addText(0, 0, "HELLO", SysColor.Transparent);
+        tg.addButton("Button", 1, new System.Drawing.Size(10, 5), new System.Drawing.Point(20, 20), SysColor.Blue);
+
         InvokeRepeating("updateMatrix", 0, 0.1f);
 
 
@@ -41,7 +41,6 @@ public class MatrixBackground : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //updateMatrix();
     }
 
     /// <summary>

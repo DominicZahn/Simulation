@@ -9,9 +9,11 @@ public class TextGrid
     private int rows;
     private Line[] lines;
     private List<Text> texts;
+    private List<Button> buttons;
     private int lineCount;
     private int maxLineLength;
     private Color[] charColors;
+    private const char empty = ' ';
 
     public TextGrid(int rows, int columns)
     {
@@ -20,10 +22,11 @@ public class TextGrid
         this.rows = rows;
         for (int i = 0; i < columns * rows; i++)
         {
-            grid[i] = ' ';
+            grid[i] = empty;
         }
         setupColors();
         setupTexts();
+        setupButtons();
     }
 
     /// <summary>
@@ -43,6 +46,7 @@ public class TextGrid
         }
         setupColors();
         setupTexts();
+        setupButtons();
     }
 
     private void setupTexts()
@@ -57,6 +61,11 @@ public class TextGrid
         {
             charColors[i] = Color.Transparent; //default colour
         }
+    }
+
+    private void setupButtons()
+    {
+        buttons = new List<Button>();
     }
 
     public int getColumns()
@@ -177,10 +186,10 @@ public class TextGrid
             }
         }
 
-        updateGrid();
+        updateGrid(0.1f);
     }
 
-    private void updateGrid()
+    private void updateGrid(float glitchPercentageText)
     {
         clearGrid();
         // Lines
@@ -191,11 +200,27 @@ public class TextGrid
                 setChar(lines[i].getStartPos().X, lines[i].getStartPos().Y + y, lines[i].getValue(y));
             }
         }
-        // Text
+        // Buttons
+        foreach (Button curr in buttons)
+        {
+            curr.updateButton();
+            int width = curr.getSize().Width;
+            int height = curr.getSize().Height;
+            // iteterates throw the field where the button should be placed
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (!curr.getValue(x, y).Equals(empty))
+                        setCharColor(curr.getTopLeftAnchor().X + x, curr.getTopLeftAnchor().Y + y, curr.getColor());
+                    setChar(curr.getTopLeftAnchor().X + x, curr.getTopLeftAnchor().Y + y, curr.getValue(x, y));
+                }
+            }
+        }
+        // Texts
         foreach (Text curr in texts)
         {
-            const float glitchPercentage = 0.1f;
-            curr.updateText(glitchPercentage);
+            curr.updateText(glitchPercentageText);
 
             //draw values
             for (int x = 0; x < curr.getValues().Length; x++)
@@ -235,6 +260,13 @@ public class TextGrid
         texts.Add(nText);
     }
 
+    public void addButton(string text, int textDelta, Size size, Point topLeftAnchor, Color color)
+    {
+        Button nButton = new Button(text, textDelta, size, topLeftAnchor, color);
+        buttons.Add(nButton);
+        texts.Add(nButton.getText());
+    }
+
     Random rng = new Random();
     private Line createLine()
     {
@@ -246,7 +278,7 @@ public class TextGrid
     {
         for (int x = 0; x < rows; x++)
             for (int y = 0; y < columns; y++)
-                setChar(x, y, ' ');
+                setChar(x, y, empty);
     }
 
     private int gridIndex(int x, int y)
@@ -441,10 +473,114 @@ public class TextGrid
             values = text.ToCharArray();
             for (int i = 0; i < glitchCount; i++)
             {
-                if (values[glitches[i]].Equals(' '))
+                if (values[glitches[i]].Equals(empty))
                     continue;
                 values[glitches[i]] = (char)(48 + rng.Next(9));
             }
+        }
+    }
+
+    private class Button
+    {
+        private Text text;
+        private Size size;
+        private Point topLeftAnchor;
+        private Color color;
+        // starts at the top left and goes clockwise around
+        private char[] values;
+        private const int borderSize = 1;
+        // for every rng aspect of the object
+        Random rng = new Random();
+
+        public Button(string text, int textDelta, Size size, Point topLeftAnchor, Color color)
+        {
+            setSize(size.Width, size.Height);
+            setColor(color);
+            setTopLeftAnchor(topLeftAnchor.X, topLeftAnchor.Y);
+            setText(textDelta, text);
+            setupValues();
+        }
+
+        public void setText(int delta, string text)
+        {
+            // check if text is too long
+            if (text.Length > (size.Width - (delta + borderSize) * 2))
+                throw new ArgumentOutOfRangeException("The text should have a length between 0 and " + (size.Width - (delta + borderSize) * 2));
+
+            int xText = ((size.Width - text.Length) / 2) + topLeftAnchor.X;
+            int yText = (size.Height / 2) + topLeftAnchor.Y;
+            this.text = new Text(xText, yText, text, color);
+        }
+
+        public Text getText()
+        {
+            return text;
+        }
+
+        public void setTopLeftAnchor(int x, int y)
+        {
+            this.topLeftAnchor = new Point(x, y);
+        }
+
+        public Point getTopLeftAnchor()
+        {
+            return topLeftAnchor;
+        }
+
+        public void setSize(int width, int height)
+        {
+            this.size = new Size(width, height);
+        }
+
+        public Size getSize()
+        {
+            return size;
+        }
+
+        public void setColor(Color color)
+        {
+            this.color = color;
+        }
+
+        public Color getColor()
+        {
+            return color;
+        }
+
+        private void setValue(int x, int y, char c)
+        {
+            values[y * size.Width + x] = c;
+        }
+
+        public char getValue(int x, int y)
+        {
+            if ((x >= size.Width || x < 0) || (y >= size.Height || y < 0))
+                throw new ArgumentOutOfRangeException("You are trying to get access to a value outside of a button.");
+            return values[y * size.Width + x];
+        }
+
+        public void updateButton()
+        {
+            for (int x = 0; x < size.Width; x++)
+            {
+                for (int y = 0; y < size.Height; y++)
+                {
+                    if (x == 0 || y == 0 || x == (size.Width - 1) || y == (size.Height - 1))
+                    {
+                        setValue(x, y, (char)(48 + rng.Next(9)));
+                    }
+                    else
+                    {
+                        setValue(x, y, empty);
+                    }
+                }
+            }
+        }
+
+        private void setupValues()
+        {
+            values = new char[size.Width * size.Height];
+            updateButton();
         }
     }
 }
