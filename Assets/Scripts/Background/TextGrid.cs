@@ -132,6 +132,7 @@ public class TextGrid
     /// <returns>A string that represents the grid.</returns>
     public string gridToString()
     {
+        // use String Builder
         string strGrid = $"";
         for (int i = 0; i < columns; i++)
         {
