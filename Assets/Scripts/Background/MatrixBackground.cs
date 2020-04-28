@@ -4,6 +4,11 @@ using UnityEngine;
 using TMPro;
 using SysColor = System.Drawing.Color;
 using UnityEngine.UI;
+using System;
+using System.Runtime.CompilerServices;
+using SysRandom = System.Random;
+using URandom = UnityEngine.Random;
+using UnityEngine.Events;
 
 public class MatrixBackground : MonoBehaviour
 {
@@ -23,7 +28,7 @@ public class MatrixBackground : MonoBehaviour
         tg = new TextGrid(maxRows, maxColumns);
         tg.setupLines(lineCount, maxLength);
 
-        addButton(tg, "Button", 15, 20, 100, 30, SysColor.Red);
+        addButton(tg, "Button", 15, 20, 100, 30, SysColor.Red, onClick);
 
         InvokeRepeating("updateMatrix", 0, 0.1f);
 
@@ -46,7 +51,7 @@ public class MatrixBackground : MonoBehaviour
     {
     }
 
-    private void addButton(TextGrid tg, string text, int width, int height, int x, int y, SysColor color)
+    private void addButton(TextGrid tg, string text, int width, int height, int x, int y, SysColor color, UnityAction onClick)
     {
         const int standardDelta = 1;
         tg.addButton(text, standardDelta, new System.Drawing.Size(width, height), new System.Drawing.Point(x, y), color);
@@ -74,7 +79,7 @@ public class MatrixBackground : MonoBehaviour
     void onClick()
     {
         Debug.Log("Clicked");
-        addButton(tg, "Button", Random.Range(8, 20), Random.Range(6, 20), Random.Range(0, tg.getRows() - 20), Random.Range(0, tg.getColumns() - 20), SysColor.Red);
+        addButton(tg, "Button", URandom.Range(8, 20), URandom.Range(6, 20), URandom.Range(0, tg.getRows() - 20), URandom.Range(0, tg.getColumns() - 20), SysColor.Red, onClick);
     }
 
     /// <summary>
