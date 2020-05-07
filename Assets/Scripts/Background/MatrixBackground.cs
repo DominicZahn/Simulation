@@ -24,25 +24,42 @@ public class MatrixBackground : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        tg = setupTextGrid(lineCount, maxLength);
         background.richText = true;
-        tg = new TextGrid(maxRows, maxColumns);
         tg.setupLines(lineCount, maxLength);
-
-        addButton(tg, "Button", 15, 20, 100, 30, SysColor.Red, onClick);
+        setupButtons();
+        setupText();
 
         InvokeRepeating("updateMatrix", 0, 0.1f);
+    }
 
+    void adjustTextMesh()
+    {
+        background.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.currentResolution.width, Screen.currentResolution.height);
+    }
 
-        /*
-        background.richText = true;
-        string oldText = "Hello world";
-        background.text = $"Colored text <color=red>{ oldText }</color>";
-        */
+    TextGrid setupTextGrid(int lineCount, int maxLength)
+    {
+        adjustTextMesh();
+        Vector2 v2 = background.GetComponent<RectTransform>().sizeDelta;
+        int rows = (int)(v2.x / 11.29f);
+        int columns = (int)(v2.y / 15.88);
+        return new TextGrid(rows, columns);
+    }
+
+    void setupButtons()
+    {
+
+    }
+
+    void setupText()
+    {
+        
     }
 
     void updateMatrix()
     {
-        tg.expandLines();
+        tg.updateGrid(0.1f);
         background.text = tg.gridToString();
     }
 
@@ -72,14 +89,7 @@ public class MatrixBackground : MonoBehaviour
 
     private Vector2 posButtonUnity(int x, int y)
     {
-        
         return new Vector2(11.2f * x + 16, -15.8f * y - 7);
-    }
-
-    void onClick()
-    {
-        Debug.Log("Clicked");
-        addButton(tg, "Button", URandom.Range(8, 20), URandom.Range(6, 20), URandom.Range(0, tg.getRows() - 20), URandom.Range(0, tg.getColumns() - 20), SysColor.Red, onClick);
     }
 
     /// <summary>

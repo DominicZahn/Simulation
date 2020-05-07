@@ -186,14 +186,13 @@ public class TextGrid
                 lines[i] = createLine();
             }
         }
-
-        updateGrid(0.1f);
     }
 
-    private void updateGrid(float glitchPercentageText)
+    public void updateGrid(float glitchPercentageText)
     {
         clearGrid();
         // Lines
+        expandLines();
         for (int i = 0; i < lines.Length; i++)
         {
             for (int y = 0; y < lines[i].getLength() - 1; y++)
