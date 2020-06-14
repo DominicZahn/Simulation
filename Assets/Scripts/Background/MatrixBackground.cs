@@ -46,7 +46,7 @@ public class MatrixBackground : MonoBehaviour
         int columns = (int)(v2.y / 15.88);
         return new TextGrid(rows, columns);
     }
-
+    
     void setupButtons()
     {
 
@@ -66,8 +66,10 @@ public class MatrixBackground : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.LogError("Mistake");
     }
 
+    // used for creating buttons with functionality
     private void addButton(TextGrid tg, string text, int width, int height, int x, int y, SysColor color, UnityAction onClick)
     {
         const int standardDelta = 1;
